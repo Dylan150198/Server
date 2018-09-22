@@ -2,53 +2,31 @@ import com.google.gson.*;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 
-import java.io.IOException;
-import java.io.StringReader;
+import javax.xml.ws.Response;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Scanner;
 
-public class Protocol
-{
+public class Protocol {
     private String isbn;
     private String jsonFromApi = null;
-    public Protocol(String isbn)
-    {
+
+    public Protocol(String isbn) {
         this.isbn = isbn;
     }
-    public Book BookInfo() throws IOException {
-        // Pass the desired URL as an object:
-        URL bookInfo = new URL("https://www.googleapis.com/books/v1/volumes?q=isbn:" + isbn);
-        // https://www.googleapis.com/books/v1/volumes?q=isbn?=9789043026970
-        // Type cast the URL object into a HttpURLConnection object.
-        HttpURLConnection conn = (HttpURLConnection) bookInfo.openConnection();
-        // Set the request type
-        conn.setRequestMethod("GET");
-        // Open a connection stream
-        conn.connect();
-        // Get the corresponding response code
-        int responsecode = conn.getResponseCode();
-        // Now we need to perform a check so that if the response code is not 200, we throw a runtime exception
-        if (responsecode != 200) {
-            throw new RuntimeException("HttpResponseCode: " +responsecode);
-        }
-        else
-        {
-            // Scanner to read each line from the API
-            Scanner scApi = new Scanner(bookInfo.openStream());
-            while (scApi.hasNext())
-            {
-                jsonFromApi += scApi.nextLine();
-            }
-            System.out.println(jsonFromApi);
-            scApi.close();
-        }
-        System.out.println(jsonFromApi);
-        // JSON reading using GSON
-        JsonReader jsonReader = new JsonReader(new StringReader(jsonFromApi)); // Creating a GSON JsonReader
 
-        return new Book();
-        }
+    public BookDetail BookInfo() throws IOException {
+        URL book = new URL("https://www.googleapis.com/books/v1/volumes?q=isbn:" + isbn); // Pass the desired URL as an object:
+        InputStream input = book.openStream(); // Opening a InputStream to the URL
+        Reader reader = new InputStreamReader(input, "UTF-8"); // Reading the InputStream
+        JsonResult result = new Gson().fromJson(reader, JsonResult.class);  // Parsing the JSON to an object using Gson
+        BookDetail bookInfo = new BookDetail(); // Creating a new object and passing along some data for this new object.
+        bookInfo.setTitle(result.getBookDetail().getTitle());
+        bookInfo.setSubTitle(result.getBookDetail().getSubTitle());
+        bookInfo.setAuthors(result.getBookDetail().getAuthors());
+        return bookInfo; // Returning the object.
     }
+}
 

@@ -1,22 +1,12 @@
+import com.google.gson.annotations.SerializedName;
 public class Book {
-    private String title;
-    private String subTitle;
 
-    public String getTitle() {
-        return title;
+    @SerializedName("id")
+    private String id;
+    @SerializedName("volumeInfo")
+    private BookDetail bookDetail;
+
+    public BookDetail getBookDetail() {
+        return bookDetail;
     }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getSubTitle() {
-        return subTitle;
-    }
-
-    public void setSubTitle(String subTitle) {
-        this.subTitle = subTitle;
-    }
-
-
 }
